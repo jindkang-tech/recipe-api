@@ -72,14 +72,13 @@ JWT_SECRET=your_secret_key
 cd backend
 npm start
 ```
-The server will run on http://localhost:3005
 
 2. Start the frontend development server:
 ```bash
 cd frontend
 npm start
 ```
-The frontend will run on http://localhost:3000
+
 
 ### API Documentation
 Once the backend server is running, you can access the Swagger API documentation at:
