@@ -80,9 +80,5 @@ npm start
 ```
 
 
-### API Documentation
-Once the backend server is running, you can access the Swagger API documentation at:
-http://localhost:3005/api-docs
-
 ## License
 MIT License
