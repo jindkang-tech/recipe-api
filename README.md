@@ -141,6 +141,72 @@ To implement automated API endpoint tests, you can use tools like Jest and Super
 
 ## Deployment
 
+### For New Users (General Setup)
+
+This recipe management application can be set up in any environment with Node.js and MySQL. Here's how to get started:
+
+1. **Clone or Download the Repository**
+   ```bash
+   git clone [repository-url]
+   # or download and extract the ZIP file
+   ```
+
+2. **Database Setup**
+   - Create a MySQL database called `recipe_db`
+   - Import the database schema:
+     ```bash
+     mysql -u [your-username] -p recipe_db < backend/database.sql
+     ```
+   - Update database connection settings in `backend/src/config/database.js` if needed
+
+3. **Backend Setup**
+   - Navigate to the backend directory:
+     ```bash
+     cd backend
+     ```
+   - Install dependencies:
+     ```bash
+     npm install
+     ```
+   - Initialize admin user:
+     ```bash
+     node src/init-admin.js
+     ```
+   - Update database schema if needed:
+     ```bash
+     node src/update-schema.js
+     ```
+   - Start the server:
+     ```bash
+     npm start
+     ```
+   - Backend will run on http://localhost:3005
+
+4. **Frontend Setup**
+   - Navigate to the frontend directory:
+     ```bash
+     cd frontend
+     ```
+   - Install dependencies:
+     ```bash
+     npm install
+     ```
+   - Start the React development server:
+     ```bash
+     npm start
+     ```
+   - Frontend will run on http://localhost:3000
+
+5. **Login Information**
+   - Username: `jind`
+   - Password: `admin123`
+
+6. **Using the API**
+   - Use Postman, curl, or any API client to test the API endpoints
+   - Base URL: `http://localhost:3005/api`
+   - API documentation: `http://localhost:3005/api-docs` (if enabled)
+   - All protected endpoints require a JWT token obtained from `/api/auth/login`
+
 ### Codio Deployment Instructions
 
 This application is fully configured to work in the Codio environment. Follow these detailed steps to deploy:
