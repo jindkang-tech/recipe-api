@@ -10,7 +10,7 @@ A full-stack recipe management application built with Node.js, React, and MySQL.
 - Recipe ratings and comments
 - Meal planning
 - Admin panel for user management
-- Swagger API documentation
+- HTML API documentation
 
 ## Tech Stack
 
@@ -19,7 +19,7 @@ A full-stack recipe management application built with Node.js, React, and MySQL.
 - Koa.js web framework
 - MySQL database (via mysql2)
 - JWT authentication
-- Swagger API documentation
+- Html API documentation
 
 ### Frontend
 - React 18
@@ -80,5 +80,3 @@ npm start
 ```
 
 
-## License
-MIT License
