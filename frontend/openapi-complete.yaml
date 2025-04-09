@@ -1,0 +1,1790 @@
+openapi: 3.0.3
+info:
+  title: Recipe Management System API
+  description: |
+    This API provides endpoints for managing recipes, categories, meal plans, and user authentication
+    in the Recipe Management System.
+  version: 1.0.0
+  contact:
+    name: Recipe Management System Support
+    email: support@recipemanagementsystem.com
+servers:
+  - url: http://localhost:3005/api
+    description: Development server
+tags:
+  - name: Authentication
+    description: User authentication operations
+  - name: Recipes
+    description: Recipe management operations
+  - name: Categories
+    description: Recipe category operations
+  - name: Meal Plans
+    description: Meal planning operations
+  - name: Admin
+    description: Administrative operations
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+      required:
+        - error
+    
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the user
+        username:
+          type: string
+          description: Username for login
+        email:
+          type: string
+          format: email
+          description: User email address
+        is_admin:
+          type: boolean
+          description: Whether the user has admin privileges
+        created_at:
+          type: string
+          format: date-time
+          description: User creation timestamp
+      required:
+        - id
+        - username
+        - email
+    
+    UserCredentials:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username for login
+        password:
+          type: string
+          format: password
+          description: User password
+      required:
+        - username
+        - password
+    
+    UserRegistration:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username for login
+        email:
+          type: string
+          format: email
+          description: User email address
+        password:
+          type: string
+          format: password
+          description: User password
+      required:
+        - username
+        - email
+        - password
+    
+    AuthResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Success message
+        user:
+          $ref: '#/components/schemas/User'
+        token:
+          type: string
+          description: JWT authentication token
+      required:
+        - message
+        - user
+        - token
+    
+    Recipe:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the recipe
+        title:
+          type: string
+          description: Recipe title
+        description:
+          type: string
+          description: Recipe description
+        ingredients:
+          type: array
+          items:
+            type: string
+          description: List of ingredients
+        instructions:
+          type: string
+          description: Cooking instructions
+        prep_time:
+          type: integer
+          description: Preparation time in minutes
+        cook_time:
+          type: integer
+          description: Cooking time in minutes
+        servings:
+          type: integer
+          description: Number of servings
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+          description: Recipe difficulty level
+        image_url:
+          type: string
+          format: uri
+          description: URL to recipe image
+        category_id:
+          type: integer
+          format: int64
+          description: ID of the category this recipe belongs to
+        user_id:
+          type: integer
+          format: int64
+          description: ID of the user who created this recipe
+        created_at:
+          type: string
+          format: date-time
+          description: Recipe creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Recipe last update timestamp
+        average_rating:
+          type: number
+          format: float
+          description: Average rating of the recipe
+      required:
+        - id
+        - title
+        - ingredients
+        - instructions
+        - user_id
+    
+    RecipeInput:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Recipe title
+        description:
+          type: string
+          description: Recipe description
+        ingredients:
+          type: array
+          items:
+            type: string
+          description: List of ingredients
+        instructions:
+          type: string
+          description: Cooking instructions
+        prep_time:
+          type: integer
+          description: Preparation time in minutes
+        cook_time:
+          type: integer
+          description: Cooking time in minutes
+        servings:
+          type: integer
+          description: Number of servings
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+          description: Recipe difficulty level
+        image_url:
+          type: string
+          format: uri
+          description: URL to recipe image
+        category_id:
+          type: integer
+          format: int64
+          description: ID of the category this recipe belongs to
+      required:
+        - title
+        - ingredients
+        - instructions
+    
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the category
+        name:
+          type: string
+          description: Category name
+        description:
+          type: string
+          description: Category description
+        created_at:
+          type: string
+          format: date-time
+          description: Category creation timestamp
+      required:
+        - id
+        - name
+    
+    CategoryInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Category name
+        description:
+          type: string
+          description: Category description
+      required:
+        - name
+    
+    MealPlan:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the meal plan
+        date:
+          type: string
+          format: date
+          description: Date for this meal plan
+        meal_type:
+          type: string
+          enum: [breakfast, lunch, dinner, snack]
+          description: Type of meal
+        recipe_id:
+          type: integer
+          format: int64
+          description: ID of the recipe for this meal
+        user_id:
+          type: integer
+          format: int64
+          description: ID of the user who created this meal plan
+        notes:
+          type: string
+          description: Additional notes for this meal plan
+        created_at:
+          type: string
+          format: date-time
+          description: Meal plan creation timestamp
+      required:
+        - id
+        - date
+        - meal_type
+        - recipe_id
+        - user_id
+    
+    MealPlanInput:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+          description: Date for this meal plan
+        meal_type:
+          type: string
+          enum: [breakfast, lunch, dinner, snack]
+          description: Type of meal
+        recipe_id:
+          type: integer
+          format: int64
+          description: ID of the recipe for this meal
+        notes:
+          type: string
+          description: Additional notes for this meal plan
+      required:
+        - date
+        - meal_type
+        - recipe_id
+    
+    Rating:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the rating
+        recipe_id:
+          type: integer
+          format: int64
+          description: ID of the rated recipe
+        user_id:
+          type: integer
+          format: int64
+          description: ID of the user who submitted the rating
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Rating value (1-5)
+        comment:
+          type: string
+          description: Optional comment with the rating
+        created_at:
+          type: string
+          format: date-time
+          description: Rating submission timestamp
+      required:
+        - id
+        - recipe_id
+        - user_id
+        - rating
+
+  UserRegistration:
+    type: object
+    properties:
+      username:
+        type: string
+        description: Username for the new account
+      email:
+        type: string
+        format: email
+        description: Email address
+      password:
+        type: string
+        format: password
+        description: Password for the account
+    required:
+      - username
+      - email
+      - password
+
+  UserCredentials:
+    type: object
+    properties:
+      username:
+        type: string
+        description: Username
+      password:
+        type: string
+        format: password
+        description: Password
+    required:
+      - username
+      - password
+
+  AuthResponse:
+    type: object
+    properties:
+      user:
+        $ref: '#/components/schemas/User'
+      token:
+        type: string
+        description: JWT authentication token
+
+  RecipeInput:
+    type: object
+    properties:
+      title:
+        type: string
+        description: Recipe title
+      description:
+        type: string
+        description: Recipe description
+      ingredients:
+        type: array
+        items:
+          type: string
+        description: List of ingredients
+      instructions:
+        type: string
+        description: Cooking instructions
+      prep_time:
+        type: integer
+        description: Preparation time in minutes
+      cook_time:
+        type: integer
+        description: Cooking time in minutes
+      servings:
+        type: integer
+        description: Number of servings
+      category_id:
+        type: integer
+        description: Category ID
+      image_url:
+        type: string
+        description: URL to recipe image
+    required:
+      - title
+      - ingredients
+      - instructions
+
+  CategoryInput:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Category name
+      description:
+        type: string
+        description: Category description
+    required:
+      - name
+
+  MealPlanInput:
+    type: object
+    properties:
+      date:
+        type: string
+        format: date
+        description: Date for the meal plan
+      meal_type:
+        type: string
+        enum: [breakfast, lunch, dinner, snack]
+        description: Type of meal
+      recipe_id:
+        type: integer
+        description: ID of the recipe for this meal
+      notes:
+        type: string
+        description: Additional notes for this meal plan
+    required:
+      - date
+      - meal_type
+      - recipe_id
+
+paths:
+  /register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account with the provided information
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input or username/email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: Login a user
+      description: Authenticate a user with username and password
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentials'
+      responses:
+        '200':
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user
+      description: Retrieve the currently authenticated user's information
+      operationId: getCurrentUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Current user information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /recipes:
+    get:
+      tags:
+        - Recipes
+      summary: Get all recipes
+      description: Retrieve a list of all recipes
+      operationId: getAllRecipes
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A list of recipes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    post:
+      tags:
+        - Recipes
+      summary: Create a recipe
+      description: Create a new recipe
+      operationId: createRecipe
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipeInput'
+      responses:
+        '201':
+          description: Recipe created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /recipes/search:
+    get:
+      tags:
+        - Recipes
+      summary: Search recipes
+      description: Search for recipes by query term
+      operationId: searchRecipes
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: query
+          in: query
+          description: Search term
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of recipes matching the search term
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /recipes/category/{categoryId}:
+    get:
+      tags:
+        - Recipes
+      summary: Get recipes by category
+      description: Retrieve a list of recipes in a specific category
+      operationId: getRecipesByCategory
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: categoryId
+          in: path
+          description: ID of the category
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A list of recipes in the specified category
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /recipes/{id}:
+    get:
+      tags:
+        - Recipes
+      summary: Get recipe by ID
+      description: Retrieve a specific recipe by its ID
+      operationId: getRecipeById
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the recipe
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Recipe details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Recipe not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      tags:
+        - Recipes
+      summary: Update recipe
+      description: Update an existing recipe
+      operationId: updateRecipe
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the recipe to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipeInput'
+      responses:
+        '200':
+          description: Recipe updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized to update this recipe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Recipe not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    delete:
+      tags:
+        - Recipes
+      summary: Delete recipe
+      description: Delete an existing recipe
+      operationId: deleteRecipe
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the recipe to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Recipe deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Recipe deleted successfully
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized to delete this recipe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Recipe not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /recipes/{id}/rate:
+    post:
+      tags:
+        - Recipes
+      summary: Rate recipe
+      description: Submit a rating for a recipe
+      operationId: rateRecipe
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the recipe to rate
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                  description: Rating value (1-5)
+                comment:
+                  type: string
+                  description: Optional comment with the rating
+              required:
+                - rating
+      responses:
+        '200':
+          description: Rating submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rating'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Recipe not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /categories:
+    get:
+      tags:
+        - Categories
+      summary: Get all categories
+      description: Retrieve a list of all recipe categories
+      operationId: getAllCategories
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A list of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    post:
+      tags:
+        - Categories
+      summary: Create a category
+      description: Create a new recipe category
+      operationId: createCategory
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '201':
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized to create categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /categories/{id}:
+    get:
+      tags:
+        - Categories
+      summary: Get category by ID
+      description: Retrieve a specific category by its ID
+      operationId: getCategoryById
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the category
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Category details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      tags:
+        - Categories
+      summary: Update category
+      description: Update an existing category
+      operationId: updateCategory
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the category to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '200':
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized to update categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    delete:
+      tags:
+        - Categories
+      summary: Delete category
+      description: Delete an existing category
+      operationId: deleteCategory
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the category to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Category deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Category deleted successfully
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized to delete categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /meal-plans:
+    get:
+      tags:
+        - Meal Plans
+      summary: Get all meal plans
+      description: Retrieve a list of all meal plans for the authenticated user
+      operationId: getAllMealPlans
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A list of meal plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MealPlan'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    post:
+      tags:
+        - Meal Plans
+      summary: Create a meal plan
+      description: Create a new meal plan
+      operationId: createMealPlan
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MealPlanInput'
+      responses:
+        '201':
+          description: Meal plan created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealPlan'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /meal-plans/date-range:
+    get:
+      tags:
+        - Meal Plans
+      summary: Get meal plans by date range
+      description: Retrieve meal plans within a specific date range
+      operationId: getMealPlansByDateRange
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          description: Start date (YYYY-MM-DD)
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: End date (YYYY-MM-DD)
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: A list of meal plans within the specified date range
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MealPlan'
+        '400':
+          description: Invalid date format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /meal-plans/{id}:
+    get:
+      tags:
+        - Meal Plans
+      summary: Get meal plan by ID
+      description: Retrieve a specific meal plan by its ID
+      operationId: getMealPlanById
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the meal plan
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Meal plan details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealPlan'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized to view this meal plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Meal plan not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      tags:
+        - Meal Plans
+      summary: Update meal plan
+      description: Update an existing meal plan
+      operationId: updateMealPlan
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the meal plan to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MealPlanInput'
+      responses:
+        '200':
+          description: Meal plan updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealPlan'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized to update this meal plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Meal plan not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    delete:
+      tags:
+        - Meal Plans
+      summary: Delete meal plan
+      description: Delete an existing meal plan
+      operationId: deleteMealPlan
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the meal plan to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Meal plan deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Meal plan deleted successfully
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized to delete this meal plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Meal plan not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /admin/users:
+    get:
+      tags:
+        - Admin
+      summary: Get all users
+      description: Retrieve a list of all users (admin only)
+      operationId: getAllUsers
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized (admin only)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /admin/users/{id}:
+    get:
+      tags:
+        - Admin
+      summary: Get user by ID
+      description: Retrieve a specific user by ID (admin only)
+      operationId: getUserById
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized (admin only)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      tags:
+        - Admin
+      summary: Update user
+      description: Update a user's information (admin only)
+      operationId: updateUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the user to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Username
+                email:
+                  type: string
+                  format: email
+                  description: Email address
+                is_admin:
+                  type: boolean
+                  description: Admin status
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized (admin only)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    delete:
+      tags:
+        - Admin
+      summary: Delete user
+      description: Delete a user (admin only)
+      operationId: deleteUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the user to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User deleted successfully
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized (admin only)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /admin/system/backup:
+    post:
+      tags:
+        - Admin
+      summary: Backup database
+      description: Create a backup of the database (admin only)
+      operationId: backupDatabase
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Database backup created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Database backup created successfully
+                  backup_file:
+                    type: string
+                    example: recipe_db_backup_2025-04-04.sql
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized (admin only)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /admin/system/health:
+    get:
+      tags:
+        - Admin
+      summary: System health check
+      description: Check the health of the system (admin only)
+      operationId: systemHealthCheck
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: System health information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  database:
+                    type: string
+                    example: connected
+                  api:
+                    type: string
+                    example: operational
+                  storage:
+                    type: string
+                    example: 75% free
+                  memory:
+                    type: string
+                    example: 60% used
+                  uptime:
+                    type: string
+                    example: 7 days, 3 hours
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized (admin only)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /admin/system/cache:
+    delete:
+      tags:
+        - Admin
+      summary: Clear system cache
+      description: Clear the system cache (admin only)
+      operationId: clearSystemCache
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Cache cleared successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: System cache cleared successfully
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized (admin only)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Management API Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #2c3e50;
+            margin-top: 25px;
+            border-left: 4px solid #3498db;
+            padding-left: 10px;
+        }
+        .endpoint {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        .method {
+            font-weight: bold;
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin-right: 10px;
+            color: white;
+        }
+        .get {
+            background-color: #61affe;
+        }
+        .post {
+            background-color: #49cc90;
+        }
+        .put {
+            background-color: #fca130;
+        }
+        .delete {
+            background-color: #f93e3e;
+        }
+        .url {
+            font-family: monospace;
+            background-color: #e9ecef;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        pre {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .endpoint-details {
+            margin-top: 10px;
+            border-top: 1px solid #dee2e6;
+            padding-top: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .auth-note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Recipe Management System API Documentation</h1>
+    
+    <p>This documentation provides details about the API endpoints available in the Recipe Management System.</p>
+    
+    <div class="auth-note">
+        <strong>Authentication:</strong> Most endpoints require a JWT token for authentication. 
+        To authenticate, obtain a token from <code>/api/auth/login</code> and include it in the 
+        Authorization header as <code>Bearer &lt;token&gt;</code>.
+    </div>
+
+    <h2>Base URL</h2>
+    <p>Local development: <code>http://localhost:3005/api</code></p>
+    <p>Codio environment: <code>https://[box-name]-3005.codio-box.uk/api</code></p>
+
+    <h2>Authentication Endpoints</h2>
+
+    <div class="endpoint">
+        <span class="method post">POST</span>
+        <span class="url">/api/auth/register</span>
+        <div class="endpoint-details">
+            <p><strong>Description:</strong> Register a new user</p>
+            <p><strong>Authentication required:</strong> No</p>
+            <p><strong>Request body:</strong></p>
+            <pre>{
+  "username": "string",
+  "password": "string",
+  "email": "string"
+}</pre>
+            <p><strong>Response:</strong></p>
+            <pre>{
+  "id": "number",
+  "username": "string",
+  "email": "string"
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method post">POST</span>
+        <span class="url">/api/auth/login</span>
+        <div class="endpoint-details">
+            <p><strong>Description:</strong> Authenticate a user and get access token</p>
+            <p><strong>Authentication required:</strong> No</p>
+            <p><strong>Request body:</strong></p>
+            <pre>{
+  "username": "string",
+  "password": "string"
+}</pre>
+            <p><strong>Response:</strong></p>
+            <pre>{
+  "token": "string",
+  "user": {
+    "id": "number",
+    "username": "string",
+    "email": "string"
+  }
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/auth/me</span>
+        <div class="endpoint-details">
+            <p><strong>Description:</strong> Get current user information</p>
+            <p><strong>Authentication required:</strong> Yes</p>
+            <p><strong>Response:</strong></p>
+            <pre>{
+  "id": "number",
+  "username": "string",
+  "email": "string"
+}</pre>
+        </div>
+    </div>
+
+    <h2>Recipe Endpoints</h2>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/recipes</span>
+        <div class="endpoint-details">
+            <p><strong>Description:</strong> Get all recipes</p>
+            <p><strong>Authentication required:</strong> Yes</p>
+            <p><strong>Response:</strong></p>
+            <pre>[
+  {
+    "id": "number",
+    "title": "string",
+    "description": "string",
+    "ingredients": "string",
+    "instructions": "string",
+    "category_id": "number",
+    "image_url": "string",
+    "user_id": "number"
+  }
+]</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/recipes/:id</span>
+        <div class="endpoint-details">
+            <p><strong>Description:</strong> Get a recipe by ID</p>
+            <p><strong>Authentication required:</strong> Yes</p>
+            <p><strong>Parameters:</strong></p>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>id</td>
+                    <td>Path parameter</td>
+                    <td>ID of the recipe to retrieve</td>
+                </tr>
+            </table>
+            <p><strong>Response:</strong></p>
+            <pre>{
+  "id": "number",
+  "title": "string",
+  "description": "string",
+  "ingredients": "string",
+  "instructions": "string",
+  "category_id": "number",
+  "image_url": "string",
+  "user_id": "number"
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method post">POST</span>
+        <span class="url">/api/recipes</span>
+        <div class="endpoint-details">
+            <p><strong>Description:</strong> Create a new recipe</p>
+            <p><strong>Authentication required:</strong> Yes</p>
+            <p><strong>Request body:</strong></p>
+            <pre>{
+  "title": "string",
+  "description": "string",
+  "ingredients": "string",
+  "instructions": "string",
+  "category_id": "number",
+  "image_url": "string"
+}</pre>
+            <p><strong>Response:</strong></p>
+            <pre>{
+  "id": "number",
+  "title": "string",
+  "description": "string",
+  "ingredients": "string",
+  "instructions": "string",
+  "category_id": "number",
+  "image_url": "string",
+  "user_id": "number"
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method put">PUT</span>
+        <span class="url">/api/recipes/:id</span>
+        <div class="endpoint-details">
+            <p><strong>Description:</strong> Update a recipe</p>
+            <p><strong>Authentication required:</strong> Yes</p>
+            <p><strong>Parameters:</strong></p>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>id</td>
+                    <td>Path parameter</td>
+                    <td>ID of the recipe to update</td>
+                </tr>
+            </table>
+            <p><strong>Request body:</strong></p>
+            <pre>{
+  "title": "string",
+  "description": "string",
+  "ingredients": "string",
+  "instructions": "string",
+  "category_id": "number",
+  "image_url": "string"
+}</pre>
+            <p><strong>Response:</strong></p>
+            <pre>{
+  "id": "number",
+  "title": "string",
+  "description": "string",
+  "ingredients": "string",
+  "instructions": "string",
+  "category_id": "number",
+  "image_url": "string",
+  "user_id": "number"
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method delete">DELETE</span>
+        <span class="url">/api/recipes/:id</span>
+        <div class="endpoint-details">
+            <p><strong>Description:</strong> Delete a recipe</p>
+            <p><strong>Authentication required:</strong> Yes</p>
+            <p><strong>Parameters:</strong></p>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>id</td>
+                    <td>Path parameter</td>
+                    <td>ID of the recipe to delete</td>
+                </tr>
+            </table>
+            <p><strong>Response:</strong></p>
+            <pre>{
+  "message": "Recipe deleted successfully"
+}</pre>
+        </div>
+    </div>
+
+    <h2>Category Endpoints</h2>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/categories</span>
+        <div class="endpoint-details">
+            <p><strong>Description:</strong> Get all categories</p>
+            <p><strong>Authentication required:</strong> Yes</p>
+            <p><strong>Response:</strong></p>
+            <pre>[
+  {
+    "id": "number",
+    "name": "string"
+  }
+]</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method post">POST</span>
+        <span class="url">/api/categories</span>
+        <div class="endpoint-details">
+            <p><strong>Description:</strong> Create a new category</p>
+            <p><strong>Authentication required:</strong> Yes</p>
+            <p><strong>Request body:</strong></p>
+            <pre>{
+  "name": "string"
+}</pre>
+            <p><strong>Response:</strong></p>
+            <pre>{
+  "id": "number",
+  "name": "string"
+}</pre>
+        </div>
+    </div>
+
+    <h2>Meal Plan Endpoints</h2>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/meal-plans</span>
+        <div class="endpoint-details">
+            <p><strong>Description:</strong> Get all meal plans for the authenticated user</p>
+            <p><strong>Authentication required:</strong> Yes</p>
+            <p><strong>Response:</strong></p>
+            <pre>[
+  {
+    "id": "number",
+    "name": "string",
+    "date": "string (YYYY-MM-DD)",
+    "recipe_id": "number",
+    "recipe_title": "string",
+    "user_id": "number"
+  }
+]</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/meal-plans/date-range</span>
+        <div class="endpoint-details">
+            <p><strong>Description:</strong> Get meal plans for a specific date range</p>
+            <p><strong>Authentication required:</strong> Yes</p>
+            <p><strong>Query parameters:</strong></p>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>startDate</td>
+                    <td>Query parameter</td>
+                    <td>Start date in YYYY-MM-DD format</td>
+                </tr>
+                <tr>
+                    <td>endDate</td>
+                    <td>Query parameter</td>
+                    <td>End date in YYYY-MM-DD format</td>
+                </tr>
+            </table>
+            <p><strong>Response:</strong></p>
+            <pre>[
+  {
+    "id": "number",
+    "name": "string",
+    "date": "string (YYYY-MM-DD)",
+    "recipe_id": "number",
+    "recipe_title": "string",
+    "user_id": "number"
+  }
+]</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method post">POST</span>
+        <span class="url">/api/meal-plans</span>
+        <div class="endpoint-details">
+            <p><strong>Description:</strong> Create a new meal plan</p>
+            <p><strong>Authentication required:</strong> Yes</p>
+            <p><strong>Request body:</strong></p>
+            <pre>{
+  "name": "string (optional)",
+  "date": "string (YYYY-MM-DD)",
+  "recipe_id": "number"
+}</pre>
+            <p><strong>Response:</strong></p>
+            <pre>{
+  "id": "number",
+  "name": "string",
+  "date": "string (YYYY-MM-DD)",
+  "recipe_id": "number",
+  "recipe_title": "string",
+  "user_id": "number"
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method put">PUT</span>
+        <span class="url">/api/meal-plans/:id</span>
+        <div class="endpoint-details">
+            <p><strong>Description:</strong> Update a meal plan</p>
+            <p><strong>Authentication required:</strong> Yes</p>
+            <p><strong>Parameters:</strong></p>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>id</td>
+                    <td>Path parameter</td>
+                    <td>ID of the meal plan to update</td>
+                </tr>
+            </table>
+            <p><strong>Request body:</strong></p>
+            <pre>{
+  "name": "string (optional)",
+  "date": "string (YYYY-MM-DD)",
+  "recipe_id": "number"
+}</pre>
+            <p><strong>Response:</strong></p>
+            <pre>{
+  "id": "number",
+  "name": "string",
+  "date": "string (YYYY-MM-DD)",
+  "recipe_id": "number",
+  "recipe_title": "string",
+  "user_id": "number"
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method delete">DELETE</span>
+        <span class="url">/api/meal-plans/:id</span>
+        <div class="endpoint-details">
+            <p><strong>Description:</strong> Delete a meal plan</p>
+            <p><strong>Authentication required:</strong> Yes</p>
+            <p><strong>Parameters:</strong></p>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>id</td>
+                    <td>Path parameter</td>
+                    <td>ID of the meal plan to delete</td>
+                </tr>
+            </table>
+            <p><strong>Response:</strong></p>
+            <pre>{
+  "message": "Meal plan deleted successfully"
+}</pre>
+        </div>
+    </div>
+
+    <hr>
+    <p><strong>Last updated:</strong> April 8, 2025</p>
+</body>
+</html>

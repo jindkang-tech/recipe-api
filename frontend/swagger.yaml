@@ -1,0 +1,156 @@
+openapi: 3.0.0
+info:
+  title: Recipe API
+  description: A RESTful API for managing recipes
+  version: 1.0.0
+servers:
+  - url: http://localhost:3001/api
+    description: Local development server
+paths:
+  /recipes:
+    get:
+      summary: Get all recipes
+      description: Returns a list of all recipes
+      responses:
+        '200':
+          description: A JSON array of recipes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+    post:
+      summary: Create a new recipe
+      description: Creates a new recipe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipeInput'
+      responses:
+        '201':
+          description: Created recipe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /recipes/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: The recipe ID
+    get:
+      summary: Get a recipe by ID
+      description: Returns a single recipe
+      responses:
+        '200':
+          description: A recipe object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        '404':
+          description: Recipe not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update a recipe
+      description: Updates an existing recipe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipeInput'
+      responses:
+        '200':
+          description: Updated recipe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Recipe not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a recipe
+      description: Deletes a recipe
+      responses:
+        '204':
+          description: No content
+        '404':
+          description: Recipe not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Recipe:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The recipe ID
+        title:
+          type: string
+          description: The recipe title
+        ingredients:
+          type: string
+          description: The recipe ingredients
+        instructions:
+          type: string
+          description: The recipe instructions
+        created_at:
+          type: string
+          format: date-time
+          description: The creation timestamp
+      required:
+        - id
+        - title
+        - ingredients
+        - instructions
+    RecipeInput:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The recipe title
+        ingredients:
+          type: string
+          description: The recipe ingredients
+        instructions:
+          type: string
+          description: The recipe instructions
+      required:
+        - title
+        - ingredients
+        - instructions
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
